@@ -1,21 +1,26 @@
-version: '3.8'
 services:
   app:
     build: .
     ports:
-      - "8000:8000"
+      - "5746:5746"
     depends_on:
       - db
     environment:
       - PYTHONUNBUFFERED=1
+    networks:
+      - jota-network
   db:
-    image: postgres:13
+    image: postgres:15
     environment:
       - POSTGRES_DB=jota_news
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - jota-network
 volumes:
   postgres_data:
-    driver: local
+networks:
+  jota-network:
+    driver: bridge

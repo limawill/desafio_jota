@@ -38,10 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'core',
-    'webhook',
-    'classification',
-    'api',
+    'news_api.apps.core.apps.CoreConfig',
+    'news_api.apps.webhook.apps.WebhookConfig',
+    'news_api.apps.classification.apps.ClassificationConfig',
+    'news_api.apps.api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [

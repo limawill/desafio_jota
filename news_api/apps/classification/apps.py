@@ -3,4 +3,4 @@ from django.apps import AppConfig
 
 class ClassificationConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'classification'
+    name = 'news_api.apps.classification'
