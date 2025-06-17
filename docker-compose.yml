@@ -5,6 +5,7 @@ services:
       - "5746:5746"
     depends_on:
       - db
+      - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
     networks:
@@ -17,6 +18,26 @@ services:
       - POSTGRES_PASSWORD=postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - jota-network
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbit
+      - RABBITMQ_DEFAULT_PASS=rabbit
+    networks:
+      - jota-network
+  celery:
+    build: .
+    command: celery -A news_api worker --loglevel=info
+    depends_on:
+      - rabbitmq
+      - db
+    environment:
+      - PYTHONUNBUFFERED=1
     networks:
       - jota-network
 volumes:

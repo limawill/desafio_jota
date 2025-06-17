@@ -7,9 +7,9 @@ class NewsWebhookView(APIView):
     def post(self, request):
         serializer = NewsWebhookSerializer(data=request.data)
         if serializer.is_valid():
-            news = serializer.save()
+            serializer.save()
             return Response(
-                {"message": "News created successfully", "id": news.id},
-                status=status.HTTP_201_CREATED
+                {"message": "News queued for processing"},
+                status=status.HTTP_202_ACCEPTED
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
