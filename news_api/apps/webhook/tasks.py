@@ -1,5 +1,7 @@
 from celery import shared_task
 from news_api.apps.core.models import Category, Subcategory, Tag, News
+from news_api.apps.classification.classifier import classify_news
+from news_api.apps.classification.models import Classification
 
 @shared_task
 def process_news(data):
@@ -30,8 +32,17 @@ def process_news(data):
         is_urgent=data['is_urgent']
     )
 
-    # Associar tags à notícia
+    # Associar tags
     if tags:
         news.tags.set(tags)
+
+    # Classificar a notícia
+    classification_result = classify_news(data['title'], data['content'], data['category'])
+    Classification.objects.create(
+        news=news,
+        sentiment=classification_result['sentiment'],
+        relevance_score=classification_result['relevance_score'],
+        category=classification_result['category']
+    )
 
     return news.id

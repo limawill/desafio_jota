@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'news_api.apps.webhook.apps.WebhookConfig',
     'news_api.apps.classification.apps.ClassificationConfig',
     'news_api.apps.api.apps.ApiConfig',
+    'news_api.apps.classification',
 ]
 
 MIDDLEWARE = [
