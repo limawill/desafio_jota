@@ -3,45 +3,50 @@ services:
     build: .
     ports:
       - "5746:5746"
+    command: ./wait-for-it.sh db:5432 -- python manage.py runserver 0.0.0.0:5746
+    volumes:
+      - ./:/app
+    entrypoint: ["/app/entrypoint.sh"]
     depends_on:
       - db
       - rabbitmq
-    environment:
-      - PYTHONUNBUFFERED=1
-    networks:
-      - jota-network
+      - redis
+    deploy:
+      resources:
+        limits:
+          memory: 512m
   db:
     image: postgres:15
     environment:
-      - POSTGRES_DB=jota_news
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: news_api
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - jota-network
   rabbitmq:
-    image: rabbitmq:3-management
+    image: rabbitmq:3-management-alpine
     ports:
-      - "5672:5672"
       - "15672:15672"
+      - "5672:5672"
     environment:
-      - RABBITMQ_DEFAULT_USER=rabbit
-      - RABBITMQ_DEFAULT_PASS=rabbit
-    networks:
-      - jota-network
+      RABBITMQ_DEFAULT_USER: rabbit
+      RABBITMQ_DEFAULT_PASS: rabbit
+  redis:
+    image: redis:7.4-alpine
   celery:
     build: .
-    command: celery -A news_api worker --loglevel=info
+    command: ./wait-for-it.sh rabbitmq:5672 -- celery -A news_api worker --loglevel=info --concurrency=2
+    volumes:
+      - ./:/app
+    entrypoint: ["/app/entrypoint.sh"]
     depends_on:
-      - rabbitmq
+      - app
       - db
-    environment:
-      - PYTHONUNBUFFERED=1
-    networks:
-      - jota-network
+      - rabbitmq
+      - redis
+    deploy:
+      resources:
+        limits:
+          memory: 1024m  # Aumentado de 512m para 1024m
 volumes:
   postgres_data:
-networks:
-  jota-network:
-    driver: bridge

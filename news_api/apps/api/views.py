@@ -8,7 +8,13 @@ class NewsListView(generics.ListAPIView):
     queryset = News.objects.select_related('category', 'subcategory').prefetch_related('tags', 'classifications')
     serializer_class = NewsSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['is_urgent', 'category__name', 'classifications__sentiment']
+    filterset_fields = [
+        'is_urgent',
+        'category__name',
+        'classifications__sentiment',
+        'publication_date',
+        'tags__name',  # Adicionado
+    ]
     search_fields = ['title', 'content']
     ordering_fields = ['publication_date', 'classifications__relevance_score']
     ordering = ['-publication_date']
